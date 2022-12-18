@@ -36,7 +36,27 @@ jobs:
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
           sudo apt-get update
           sudo apt-get install helm
-          
+
+      - name: Install Ansible
+        id: ansible
+        run: python3 -m pip install --user ansible && ansible --version
+
+      - name: Install Kubernetes
+        id: kubernetes
+        run: python3 -m pip install kubernetes
+
+      - name: Install Kubectl
+        id: kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum -c
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+      - name: Install Kubernetes.core
+        id: kubecore
+        run: ansible-galaxy collection install kubernetes.core
+    
       - name: SSH setup
         run: |
           sudo mkdir -p /home/runner/.ssh
