@@ -78,7 +78,9 @@ jobs:
             rm clusterid.txt
           fi && \
           terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}' > clusterid.txt && \
-          cat clusterid.txt
+          export CLUSTER_ID=$(cat clusterid.txt) && \
+          echo $CLUSTER_ID && \
+          doctl kubernetes cluster kubeconfig save $CLUSTER_ID 
           
       # - name: Test
       #   id: test
@@ -89,9 +91,6 @@ jobs:
       #     if test -f "./terraform/ws.json"; then 
       #       rm ./terraform/ws.json
       #     fi && \
-      #     export CLUSTER_ID=$(cat ./clusterid.txt) && \
-      #     echo $CLUSTER_ID && \
-      #     doctl kubernetes cluster kubeconfig save $CLUSTER_ID 
       #     curl --header "Authorization: Bearer ${{ secrets.TF_TOKEN }}" --header "Content-Type: application/vnd.api+json" "https://app.terraform.io/api/v2/organizations/kavooce1/workspaces/" > ../data/ws.json && \
       #     export TF_PROJECT=$(cat ../data/ws.json | jq '.data[0].id' | sed 's/\"//g') && \
       #     curl --header "Authorization: Bearer ${{ secrets.TF_TOKEN }}" --header "Content-Type: application/vnd.api+json" "https://app.terraform.io/api/v2/workspaces/$TF_PROJECT/current-state-version?include=outputs" > ../data/outputs.json       
