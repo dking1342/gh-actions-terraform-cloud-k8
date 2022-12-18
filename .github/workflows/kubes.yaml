@@ -79,12 +79,12 @@ jobs:
           fi && \
           terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}$' > clusterid.txt && \
           export CLUSTER_ID=$(cat clusterid.txt) && \
-          echo $CLUSTER_ID && \
-          doctl kubernetes cluster kubeconfig save $CLUSTER_ID 
+          echo $CLUSTER_ID
           
       # - name: Test
       #   id: test
       #   run: |
+          # doctl kubernetes cluster kubeconfig save $CLUSTER_ID 
       #     if test -f "./terraform/outputs.json"; then 
       #       rm ./terraform/outputs.json
       #     fi && \
