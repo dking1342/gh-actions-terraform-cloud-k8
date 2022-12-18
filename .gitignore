@@ -6,3 +6,4 @@
 .terraform-version
 *.log
 scripts/
+data/
