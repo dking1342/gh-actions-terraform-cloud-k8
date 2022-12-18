@@ -74,13 +74,13 @@ jobs:
         id: doctl
         run: |
           if test -f "./terraform/outputs.json"; then 
-            rm ./outputs.json
+            rm ./terraform/outputs.json
           fi && \
           if test -f "./terraform/ws.json"; then 
-            rm ./ws.json
+            rm ./terraform/ws.json
           fi && \
           if test -f "./terraform/clusterid.txt"; then 
-            rm ./clusterid.txt
+            rm ./terraform/clusterid.txt
           fi && \
           cd terraform && terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}' > ./clusterid.txt && \
           export CLUSTER_ID=$(cat ./clusterid.txt) && \
