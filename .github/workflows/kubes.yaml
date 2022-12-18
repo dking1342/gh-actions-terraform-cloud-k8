@@ -78,7 +78,7 @@ jobs:
             rm clusterid.txt
           fi && \
           terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}' > clusterid.txt && \
-          sed -e '1,2d' < clusterid.txt && \
+          sed -i '1,2d' clusterid.txt && \
           cat clusterid.txt 
           
       # - name: Test
