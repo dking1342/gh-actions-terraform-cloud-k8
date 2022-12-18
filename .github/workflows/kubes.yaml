@@ -73,17 +73,18 @@ jobs:
       - name: Retrieve cluster id
         id: doctl
         run: |
-          if test -f "./terraform/outputs.json"; then 
-            rm ./terraform/outputs.json
-          fi && \
-          if test -f "./terraform/ws.json"; then 
-            rm ./terraform/ws.json
-          fi && \
-          if test -f "./terraform/clusterid.txt"; then 
-            rm ./terraform/clusterid.txt
-          fi && \
           cd terraform && terraform output > ./clusterid.txt && \
           ls -la 
+
+    # if test -f "./terraform/outputs.json"; then 
+    #   rm ./terraform/outputs.json
+    # fi && \
+    # if test -f "./terraform/ws.json"; then 
+    #   rm ./terraform/ws.json
+    # fi && \
+    # if test -f "./terraform/clusterid.txt"; then 
+    #   rm ./terraform/clusterid.txt
+    # fi && \
     # cat ./clusterid.txt
     # cd terraform && terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}' > ./clusterid.txt && \
     # export CLUSTER_ID=$(cat ./clusterid.txt) && \
