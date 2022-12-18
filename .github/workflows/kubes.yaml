@@ -44,53 +44,49 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TF_TOKEN }}
 
-      # - name: Terraform Format
-      #   id: fmt
-      #   run: cd terraform && terraform fmt -check
+      # - name: Terraform Init
+      #   id: init
+      #   run: cd terraform && rm -fr .terraform && rm -fr .terraform.lock.hcl && terraform init
 
-      - name: Terraform Init
-        id: init
-        run: cd terraform && rm -fr .terraform && rm -fr .terraform.lock.hcl && terraform init
+      # - name: Terraform Validate
+      #   id: validate
+      #   run: terraform validate -no-color
 
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
+      # - name: Terraform Plan
+      #   id: plan
+      #   run: cd terraform && terraform plan -var "do_token=${{ secrets.DO_PAT }}" -var "pvt_key=/home/runner/.ssh/do_key_01" -var "pub_key=/home/runner/.ssh/do_key_01.pub"
+      #   continue-on-error: true
 
-      - name: Terraform Plan
-        id: plan
-        run: cd terraform && terraform plan -var "do_token=${{ secrets.DO_PAT }}" -var "pvt_key=/home/runner/.ssh/do_key_01" -var "pub_key=/home/runner/.ssh/do_key_01.pub"
-        continue-on-error: true
+      # - name: Terraform Plan Status
+      #   if: steps.plan.outcome == 'failure'
+      #   run: exit 1
 
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
+      # - name: Terraform Apply
+      #   id: apply
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   run: cd terraform && terraform apply -auto-approve -var "do_token=${{ secrets.DO_PAT }}" -var "pvt_key=/home/runner/.ssh/do_key_01" -var "pub_key=/home/runner/.ssh/do_key_01.pub"
 
-      - name: Terraform Apply
-        id: apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: cd terraform && terraform apply -auto-approve -var "do_token=${{ secrets.DO_PAT }}" -var "pvt_key=/home/runner/.ssh/do_key_01" -var "pub_key=/home/runner/.ssh/do_key_01.pub"
-
-      - name: Terraform Apply Status
-        if: steps.apply.outcome == 'failure'
-        run: exit 1
+      # - name: Terraform Apply Status
+      #   if: steps.apply.outcome == 'failure'
+      #   run: exit 1
 
       - name: Retrieve cluster id
         id: doctl
         run: |
-          if test -f "./outputs.json"; then 
+          if test -f "./terraform/outputs.json"; then 
             rm ./outputs.json
           fi && \
-          if test -f "./ws.json"; then 
+          if test -f "./terraform/ws.json"; then 
             rm ./ws.json
           fi && \
-          if test -f "./clusterid.txt"; then 
+          if test -f "./terraform/clusterid.txt"; then 
             rm ./clusterid.txt
           fi && \
           cd terraform && terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}' > ./clusterid.txt && \
           export CLUSTER_ID=$(cat ./clusterid.txt) && \
           echo $CLUSTER_ID && \
           echo "XXX" && \
-          cat ./cluster.txt
+          cat ./terraform/cluster.txt
 
     # doctl kubernetes cluster kubeconfig save $CLUSTER_ID && \
     # curl --header "Authorization: Bearer ${{ secrets.TF_TOKEN }}" --header "Content-Type: application/vnd.api+json" "https://app.terraform.io/api/v2/organizations/kavooce1/workspaces/" > ../data/ws.json && \
