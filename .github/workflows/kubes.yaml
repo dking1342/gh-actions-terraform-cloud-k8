@@ -77,19 +77,20 @@ jobs:
       - name: Retrieve cluster id
         id: doctl
         run: |
-          if test -f "./data/outputs.json"; then 
-            rm ./data/outputs.json
+          if test -f "./outputs.json"; then 
+            rm ./outputs.json
           fi && \
-          if test -f "./data/ws.json"; then 
-            rm ./data/ws.json
+          if test -f "./ws.json"; then 
+            rm ./ws.json
           fi && \
-          if test -f "./data/clusterid.txt"; then 
-            rm ./data/clusterid.txt
+          if test -f "./clusterid.txt"; then 
+            rm ./clusterid.txt
           fi && \
           cd terraform && terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}' > ./clusterid.txt && \
           export CLUSTER_ID=$(cat ./clusterid.txt) && \
           echo $CLUSTER_ID && \
-          echo $(cat ./cluster.txt)
+          echo "XXX" && \
+          cat ./cluster.txt
 
     # doctl kubernetes cluster kubeconfig save $CLUSTER_ID && \
     # curl --header "Authorization: Bearer ${{ secrets.TF_TOKEN }}" --header "Content-Type: application/vnd.api+json" "https://app.terraform.io/api/v2/organizations/kavooce1/workspaces/" > ../data/ws.json && \
