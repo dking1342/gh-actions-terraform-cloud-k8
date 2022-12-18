@@ -27,6 +27,15 @@ jobs:
           doctl version
           doctl auth init -t ${{ secrets.DO_PAT }}
           doctl account get
+
+      - name: Install Helm
+        id: helm
+        run: |
+          curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+          sudo apt-get install apt-transport-https --yes
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+          sudo apt-get update
+          sudo apt-get install helm
           
       - name: SSH setup
         run: |
@@ -80,18 +89,9 @@ jobs:
           terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}' > clusterid.txt && \
           sed -i '1,2d' clusterid.txt && \
           export CLUSTER_ID=$(cat clusterid.txt) && \
-          echo $CLUSTER_ID && \
-          doctl kubernetes cluster kubeconfig save $CLUSTER_ID 
-          
-      # - name: Test
-      #   id: test
-      #   run: |
-      #     if test -f "./terraform/outputs.json"; then 
-      #       rm ./terraform/outputs.json
-      #     fi && \
-      #     if test -f "./terraform/ws.json"; then 
-      #       rm ./terraform/ws.json
-      #     fi && \
-      #     curl --header "Authorization: Bearer ${{ secrets.TF_TOKEN }}" --header "Content-Type: application/vnd.api+json" "https://app.terraform.io/api/v2/organizations/kavooce1/workspaces/" > ../data/ws.json && \
-      #     export TF_PROJECT=$(cat ../data/ws.json | jq '.data[0].id' | sed 's/\"//g') && \
-      #     curl --header "Authorization: Bearer ${{ secrets.TF_TOKEN }}" --header "Content-Type: application/vnd.api+json" "https://app.terraform.io/api/v2/workspaces/$TF_PROJECT/current-state-version?include=outputs" > ../data/outputs.json       
+          doctl kubernetes cluster kubeconfig save $CLUSTER_ID && \
+          rm clusterid.txt
+
+      - name: Run Ansible Playbook
+        id: playbook
+        run: ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i k8s.yaml ./ansible/cluster-install.yaml -vvv        
