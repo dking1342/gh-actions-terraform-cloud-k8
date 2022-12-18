@@ -77,7 +77,7 @@ jobs:
           if test -f "clusterid.txt"; then 
             rm clusterid.txt
           fi && \
-          terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}$' > clusterid.txt && \
+          terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}\$' > clusterid.txt && \
           export CLUSTER_ID=$(cat clusterid.txt) && \
           echo $CLUSTER_ID
           
