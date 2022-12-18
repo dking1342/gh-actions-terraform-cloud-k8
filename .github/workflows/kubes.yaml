@@ -77,27 +77,28 @@ jobs:
         id: init
         run: cd terraform && rm -fr .terraform && rm -fr .terraform.lock.hcl && terraform init
 
-      # - name: Terraform Validate
-      #   id: validate
-      #   run: terraform validate -no-color
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
 
-      # - name: Terraform Plan
-      #   id: plan
-      #   run: cd terraform && terraform plan -var "do_token=${{ secrets.DO_PAT }}" -var "pvt_key=/home/runner/.ssh/do_key_01" -var "pub_key=/home/runner/.ssh/do_key_01.pub"
-      #   continue-on-error: true
+      - name: Terraform Plan
+        id: plan
+        run: cd terraform && terraform plan -var "do_token=${{ secrets.DO_PAT }}" -var "pvt_key=/home/runner/.ssh/do_key_01" -var "pub_key=/home/runner/.ssh/do_key_01.pub"
+        continue-on-error: true
 
-      # - name: Terraform Plan Status
-      #   if: steps.plan.outcome == 'failure'
-      #   run: exit 1
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
 
-      # - name: Terraform Apply
-      #   id: apply
-      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      #   run: cd terraform && terraform apply -auto-approve -var "do_token=${{ secrets.DO_PAT }}" -var "pvt_key=/home/runner/.ssh/do_key_01" -var "pub_key=/home/runner/.ssh/do_key_01.pub"
+      - name: Terraform Apply
+        id: apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: cd terraform && terraform apply -auto-approve -var "do_token=${{ secrets.DO_PAT }}" -var "pvt_key=/home/runner/.ssh/do_key_01" -var "pub_key=/home/runner/.ssh/do_key_01.pub"
+        continue-on-error: true
 
-      # - name: Terraform Apply Status
-      #   if: steps.apply.outcome == 'failure'
-      #   run: exit 1
+      - name: Terraform Apply Status
+        if: steps.apply.outcome == 'failure'
+        run: exit 1
 
       - name: Retrieve cluster id
         id: doctl
@@ -111,6 +112,15 @@ jobs:
           export CLUSTER_ID=$(cat clusterid.txt) && \
           doctl kubernetes cluster kubeconfig save $CLUSTER_ID && \
           rm clusterid.txt
+
+      - name: Remove any existing Helm charts
+        id: charts
+        run: |
+          helm uninstall mongodb-exporter && \
+          helm uninstall nginx-exporter && \
+          helm uninstall kube-prom-stack -n monitoring && \
+          helm uninstall loki -n loki-stack
+        continue-on-error: true
 
       - name: Run Ansible Playbook
         id: playbook
