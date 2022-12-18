@@ -74,16 +74,10 @@ jobs:
         id: doctl
         run: |
           cd terraform && \
-          ls -la && \
           if test -f "clusterid.txt"; then 
             rm clusterid.txt
           fi && \
-          ls -la && \
-          sudo touch clusterid.txt && \
-          sudo chmod 777 clusterid.txt && \
-          ls -la && \
-          pwd && \
-          cd terraform && terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}' > clusterid.txt && \
+          terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}' > clusterid.txt && \
           cat clusterid.txt
           
       # - name: Test
