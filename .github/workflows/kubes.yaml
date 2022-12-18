@@ -83,7 +83,7 @@ jobs:
             rm ./terraform/clusterid.txt
           fi && \
           cd terraform && terraform output > ./clusterid.txt && \
-          cat ./clusterid.txt && \
+          cat ./clusterid.txt
     # cd terraform && terraform output | grep -Eo '\w{1,}-\w{1,}-\w{1,}-\w{1,}-\w{1,}' > ./clusterid.txt && \
     # export CLUSTER_ID=$(cat ./clusterid.txt) && \
     # echo $CLUSTER_ID && \
